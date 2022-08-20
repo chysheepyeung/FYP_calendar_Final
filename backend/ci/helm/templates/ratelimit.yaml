@@ -1,0 +1,13 @@
+{{- if .Values.ambassador.ratelimit }}
+apiVersion: getambassador.io/v3alpha1
+kind: RateLimit
+metadata:
+  name: {{ include "chart.fullname" . }}
+spec:
+  domain: ambassador
+  limits:
+  - pattern:
+    - remote_address: "*"
+    rate: 2
+    unit: minute
+{{- end }}

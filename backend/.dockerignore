@@ -1,0 +1,14 @@
+.git/
+.husky/
+.next/
+.template/
+.vscode/
+ci/
+dist/
+docs/
+env/
+node_modules/
+test/
+tests/
+.env
+*.log

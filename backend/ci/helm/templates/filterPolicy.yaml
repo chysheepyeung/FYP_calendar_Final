@@ -1,0 +1,37 @@
+{{- if .Values.ambassador.authFilter.enabled }}
+apiVersion: getambassador.io/v3alpha1
+kind: FilterPolicy
+metadata:
+  name: {{ include "chart.fullname" . }}-oauth-policy
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+spec:
+  rules:
+    - filters: []
+      {{- if eq .Values.ambassador.hostMapping false }}
+      host: '*'
+      {{- end }}
+      path: "{{ .Values.ambassador.prefix}}*public/*"
+    {{- range .Values.ambassador.authFilter.settings }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    - filters:
+      - name: keycloak-oauth-filter
+        arguments:
+          scope:
+            - 'openid'
+          {{- if .Values.ambassador.authFilter.jwtEnabled }}
+          insteadOfRedirect:
+            ifRequestHeader:
+              name: 'Authorization'
+            filters:
+              - name: keycloak-jwt-filter
+                namespace: "{{ .Release.Namespace }}"
+          {{- end }}
+      - name: role-plugin-filter
+        arguments: {}
+      {{- if eq .Values.ambassador.hostMapping false }}
+      host: '*'
+      {{- end }}
+      path: "{{ .Values.ambassador.prefix}}*"
+{{- end }}

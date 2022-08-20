@@ -1,0 +1,103 @@
+# Default values for chart
+# This is a YAML-formatted file
+# Declare variables to be passed into your templates
+
+replicaCount: 1
+
+image:
+  repository: ssygitlabregistry.siksikyuen.org.hk/taonet-services/donation-backend
+  pullPolicy: IfNotPresent
+  tag: '0.1.0'
+
+imagePullSecrets: []
+parentConfigMap: 'shared-taonet-configmap'
+# nameOverride: ''
+# fullnameOverride: ''
+
+ambassador:
+  prefix: '/api/donation/'
+  # Local development should not enable [For Host CRD]
+  hostMapping: false
+  ratelimit: false
+  # Please check out ambassador filter policy setting [For development, you can disable it if you don't integrate keycloak]
+  authFilter:
+    enabled: true
+    jwtEnabled: true
+    settings:
+      # rules:
+      #  - filters:
+      #      - name: extra-filter-name
+      #    host: '*'
+      #    path: ''
+
+env:
+  - name: NODE_ENV
+    value: production
+  - name: DB_NAME
+    value: donation
+
+secret:
+  - name: DB_USERNAME
+    value: donation-user
+  - name: DB_PASSWORD
+    value: mHbpyCA9gH5arNMG
+  - name: MQ_USERNAME
+    value: admin
+  - name: MQ_PASSWORD
+    value: admin
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  # annotations: {}
+  # The name of the service account to use
+  # If not set and create is true, a name is generated using the fullname template
+  # name: ''
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+# This priority higher then podSecurityContext
+# https://kubernetes.io/zh/docs/concepts/policy/pod-security-policy/
+securityContext:
+  runAsNonRoot: true
+  # Set user id, must set it if runAsNonRoot = true
+  runAsUser: 1000
+  # Enforce not auto change group to 0 (root)
+  runAsGroup: 3000
+  # Whether the pod can enable privileged mode (access to host server) or not, by default is false, just for safe
+  privileged: false
+  # Strongly recommended to false, it can ensure that no child process can gain more privileges than its parent (disable setuid)
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

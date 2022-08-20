@@ -1,0 +1,37 @@
+stages:
+  - build-image
+
+  # - deploy-uat
+  # - deploy-production
+
+variables:
+  {}
+  # PREFIX: /
+  # NAMESPACE_UAT: taonet-uat
+  # NAMESPACE_PROD: taonet-production
+  # SERVER_HOST: https://taonet.siksikyuen.org.hk
+
+build image:
+  only:
+    - main
+  stage: build-image
+  image: docker:stable
+  variables:
+    DOCKER_TLS_CERTDIR: ''
+
+  services:
+    - name: docker:19.03.13-dind
+  before_script:
+    - docker info
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    # - cp ./alphasslrootcabundle.crt /usr/local/share/ca-certificates/ca.crt
+    # - update-ca-certificates
+
+  script:
+    #- docker info
+    #- echo $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG || docker pull $CI_REGISTRY_IMAGE:master || true
+    - docker build -f ci/Dockerfile -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA --cache-from=$CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME --cache-from=$CI_REGISTRY_IMAGE:master --shm-size 512M .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG

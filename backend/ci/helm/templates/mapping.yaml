@@ -1,0 +1,22 @@
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: {{ include "chart.fullname" . }}-oauth
+  {{- if .Values.ambassador.hostMapping }}
+  labels:
+    tag: primary
+  {{- end }}
+spec:
+  prefix: {{ .Values.ambassador.prefix }}
+  service: "{{ include "chart.fullname" . }}.{{ .Release.Namespace }}"
+  {{- if eq .Values.ambassador.hostMapping false }}
+  hostname: '*'
+  {{- end }}
+  rewrite: {{ .Values.ambassador.prefix }}
+  {{- if .Values.ambassador.ratelimit }}
+  labels:
+    ambassador:
+    - label_group:
+      - generic_key:
+          value: rate_limit
+  {{- end }}

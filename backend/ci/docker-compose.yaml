@@ -1,0 +1,14 @@
+# For local testing docker environment
+# docker-compose -p "ssy" -f ./ci/docker-compose.yaml --env-file .env up
+
+version: '3.8'
+
+services:
+  donation-backend:
+    image: donation-backend:latest
+    container_name: donation-backend
+    ports:
+      - '3000:3000'
+networks:
+  default:
+    name: ssy

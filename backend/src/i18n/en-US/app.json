@@ -1,0 +1,10 @@
+{
+  "error_msg": {
+    "database": "Database connection issue",
+    "gateway_no_response": "Payment gateway no response, please try again later",
+    "json_parse": "JSON parse error, please check your JSON format of the request body",
+    "too_many_request": "Too many request",
+    "unexpected": "Unexpected error"
+  },
+  "version": "Version:"
+}
